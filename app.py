@@ -1,14 +1,15 @@
 import os
 import sys
+
+# ✅ Ensure utils/ can be imported
+BASE_DIR = os.path.dirname(__file__)
+sys.path.append(BASE_DIR)
+
 import streamlit as st
 import pandas as pd
 import numpy as np
 from tensorflow.keras.models import load_model
 from tensorflow.keras.losses import MeanSquaredError
-
-# ✅ Ensure utils/ can be imported
-BASE_DIR = os.path.dirname(__file__)
-sys.path.append(BASE_DIR)
 
 # ✅ Local imports
 from train_model_streamlit import train_lstm_model
