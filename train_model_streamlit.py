@@ -9,9 +9,9 @@ from tensorflow.keras.layers import LSTM, Dropout, Dense
 def train_lstm_model(df, seq_len=10, model_path="model/lstm_model.h5"):
     try:
         date_column = next((col for col in df.columns if "date" in col.lower()), None)
-        if not date_column:
-            st.error("❌ Date column not found.")
-            return
+if not date_column:
+    st.error("❌ Date column not found.")
+    return
 
         df[date_column] = pd.to_datetime(df[date_column], dayfirst=True)
         df.set_index(date_column, inplace=True)
