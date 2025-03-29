@@ -6,7 +6,7 @@ import numpy as np
 from tensorflow.keras.models import load_model
 from tensorflow.keras.losses import MeanSquaredError
 
-BASE_DIR = os.path.dirname(__Nickel-Forecast__)
+BASE_DIR = os.path.dirname(__file__)
 sys.path.append(BASE_DIR)
 
 from train_model_streamlit import train_lstm_model
