@@ -14,7 +14,7 @@ sys.path.append(UTILS_DIR)
 
 # ✅ Safe dynamic imports (alternative to "from utils.prediction import ...")
 try:
-    from prediction import predict_prices, plot_predictions
+    from prediction import predict_prices
     from preprocessing import load_and_preprocess_data
 except ImportError:
     st.error("❌ Could not import utility functions. Make sure 'utils/' folder has prediction.py and preprocessing.py")
