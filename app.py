@@ -6,21 +6,28 @@ import numpy as np
 from tensorflow.keras.models import load_model
 from tensorflow.keras.losses import MeanSquaredError
 
-# === Set up base directory for relative paths ===
+# === Set up paths ===
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+UTILS_DIR = os.path.join(BASE_DIR, "utils")
 sys.path.append(BASE_DIR)
+sys.path.append(UTILS_DIR)
 
-# === Local imports ===
+# ✅ Safe dynamic imports (alternative to "from utils.prediction import ...")
+try:
+    from prediction import predict_prices, plot_predictions
+    from preprocessing import load_and_preprocess_data
+except ImportError:
+    st.error("❌ Could not import utility functions. Make sure 'utils/' folder has prediction.py and preprocessing.py")
+    st.stop()
+
 from train_model_streamlit import train_lstm_model
-from utils.preprocessing import load_and_preprocess_data
-from utils.prediction import predict_prices, plot_predictions
 
 # === Streamlit UI ===
 st.set_page_config(page_title="Nickel Price Forecast", layout="centered")
 st.title("🔮 Nickel Price Forecast (LME-based)")
 st.markdown("Forecast LME Nickel prices using AI (LSTM) and macro indicators.")
 
-# === File uploader or default ===
+# === Upload or Load Default CSV ===
 uploaded_file = st.file_uploader("📁 Upload your CSV data", type=["csv"])
 if uploaded_file:
     try:
@@ -38,14 +45,14 @@ else:
         st.error("❌ No dataset found. Please upload a CSV.")
         st.stop()
 
-# === Preprocessing ===
+# === Preprocess the data ===
 try:
     X_test, y_test, scaler, features_tail = load_and_preprocess_data(df)
 except Exception as e:
     st.error(f"❌ Preprocessing error: {e}")
     st.stop()
 
-# === Load or retrain model ===
+# === Load or Retrain Model ===
 model_path = os.path.join(BASE_DIR, "model", "lstm_model.h5")
 if not os.path.exists(model_path):
     st.warning("⚠️ No trained model found. Training a new one...")
@@ -59,12 +66,12 @@ if not os.path.exists(model_path):
 else:
     try:
         model = load_model(model_path, compile=False)
-        model.compile(optimizer="adam", loss=MeanSquaredError())
+        model.compile(optimizer='adam', loss=MeanSquaredError())
     except Exception as e:
         st.error(f"❌ Failed to load model: {e}")
         st.stop()
 
-# === Predict and display results ===
+# === Run Prediction ===
 try:
     predicted, actual = predict_prices(model, X_test, y_test, scaler, features_tail)
     plot_predictions(predicted, actual)
