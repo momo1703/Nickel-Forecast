@@ -1,3 +1,0 @@
-git add model/lstm_model.h5
-git commit -m "Add trained LSTM model"
-git push
