@@ -40,8 +40,14 @@ if st.button("🔁 Retrain LSTM Model from Current Data"):
 
 model_path = "model/lstm_model.h5"
 if not os.path.exists(model_path):
-    st.warning("⚠️ No trained model found. Please retrain it first.")
-    st.stop()
+    st.warning("⚠️ No trained model found. Training now...")
+    trained_model = train_lstm_model(df)
+    if not trained_model:
+        st.error("❌ Auto-training failed.")
+        st.stop()
+    model = trained_model
+else:
+    model = load_model(model_path)
 
 try:
     model = load_model(model_path)
