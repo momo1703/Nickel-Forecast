@@ -1,28 +1,22 @@
 import os
 import sys
-import importlib.util
+from tensorflow.keras.models import load_model
+from tensorflow.keras.losses import MeanSquaredError
+import pandas as pd
+import streamlit as st
 
-# 👇 Force import from ./utils/ even if Python doesn't detect it
+# ✅ Fix import issue for utils
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UTILS_PATH = os.path.join(BASE_DIR, "utils")
-
 if UTILS_PATH not in sys.path:
     sys.path.append(UTILS_PATH)
-
-# Optional: Make sure utils behaves as a module
 if not os.path.exists(os.path.join(UTILS_PATH, "__init__.py")):
     open(os.path.join(UTILS_PATH, "__init__.py"), 'a').close()
 
-import streamlit as st
-import pandas as pd
-import numpy as np
-from tensorflow.keras.models import load_model
-from tensorflow.keras.losses import MeanSquaredError
-
-# ✅ Local imports
-from train_model_streamlit import train_lstm_model
-from utils.preprocessing import load_and_preprocess_data
+# ✅ Now safe to import
 from prediction import predict_prices, plot_predictions
+from preprocessing import load_and_preprocess_data
+from train_model_streamlit import train_lstm_model
 
 # === Streamlit UI ===
 st.set_page_config(page_title="Nickel Price Forecast", layout="centered")
