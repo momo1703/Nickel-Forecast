@@ -41,6 +41,7 @@ model = Sequential([
 ])
 
 # ✅ Use proper loss object to prevent load errors
+from tensorflow.keras.losses import MeanSquaredError
 model.compile(optimizer='adam', loss=MeanSquaredError())
 
 # Train
