@@ -33,4 +33,8 @@ except Exception as e:
     st.error(f"❌ Preprocessing error: {e}")
     st.stop()
 
-if st.button("🔁 Retrain
+if st.button("🔁 Retrain LSTM Model from Current Data"):
+    trained_model = train_lstm_model(df)
+    if trained_model:
+        st.success("✅ Model retrained and saved!")
+
