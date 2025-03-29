@@ -5,12 +5,13 @@ import os
 from tensorflow.keras.models import load_model
 from utils.preprocessing import load_and_preprocess_data
 from utils.prediction import predict_prices, plot_predictions
-from train_model_streamlit import train_lstm_model
+from train_model_streamlit import train_lstm_model  # Must be in same folder
 
 st.set_page_config(page_title="Nickel Price Forecast", layout="centered")
 st.title("🔮 Nickel Price Forecast (LME-based)")
 st.markdown("Forecast LME Nickel prices using AI (LSTM) + macro indicators")
 
+# Upload or load default
 uploaded_file = st.file_uploader("📁 Upload your CSV data", type=["csv"])
 if uploaded_file:
     try:
@@ -27,14 +28,35 @@ else:
         st.error("❌ No data found. Please upload a CSV file.")
         st.stop()
 
+# Preprocess
 try:
     X_test, y_test, scaler, features_tail = load_and_preprocess_data(df)
 except Exception as e:
     st.error(f"❌ Preprocessing error: {e}")
     st.stop()
 
+# Retrain option
 if st.button("🔁 Retrain LSTM Model from Current Data"):
     trained_model = train_lstm_model(df)
     if trained_model:
         st.success("✅ Model retrained and saved!")
 
+# Load model
+model_path = "model/lstm_model.h5"
+if not os.path.exists(model_path):
+    st.warning("⚠️ No trained model found. Please retrain it first.")
+    st.stop()
+
+try:
+    model = load_model(model_path)
+except Exception as e:
+    st.error(f"❌ Failed to load model: {e}")
+    st.stop()
+
+# Predict & plot
+try:
+    predicted, actual = predict_prices(model, X_test, y_test, scaler, features_tail)
+    plot_predictions(predicted, actual)
+    st.success("✅ Forecast generated.")
+except Exception as e:
+    st.error(f"❌ Prediction error: {e}")
