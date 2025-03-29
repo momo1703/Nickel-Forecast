@@ -21,6 +21,7 @@ def load_and_preprocess_data(df, seq_len=10):
         raise ValueError(f"❌ Missing required columns: {', '.join(missing)}")
 
     # === Drop rows with NaNs and scale ===
+    df[features] = df[features].fillna(method="ffill")
     df = df[features].dropna()
     if len(df) <= seq_len:
         raise ValueError(f"❌ Not enough rows to build sequences. Only {len(df)} rows after cleaning, but need at least {seq_len + 1}.")
