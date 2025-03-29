@@ -40,8 +40,10 @@ def predict_prices(model, X, y, scaler, tail_features):
 
         return predicted_prices, actual_prices
 
+    except ValueError as ve:
+        st.error(str(ve))
     except Exception as e:
-        raise ValueError(f"❌ Prediction pipeline error: {e}")
+        st.error(f"❌ Unexpected prediction error: {e}")
 
 
 def plot_predictions(predicted, actual):
