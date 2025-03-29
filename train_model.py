@@ -35,4 +35,4 @@ model = Sequential([
     Dense(1)
 ])
 
-model.compile(
+model.compile()
