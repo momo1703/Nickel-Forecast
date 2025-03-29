@@ -41,8 +41,12 @@ else:
 # === Data Preprocessing ===
 try:
     X_test, y_test, scaler, features_tail = load_and_preprocess_data(df)
+except ValueError as ve:
+    st.warning(str(ve))
+    st.info("📌 Tip: Your data must have at least 11 complete rows.")
+    st.stop()
 except Exception as e:
-    st.error(f"❌ Preprocessing error: {e}")
+    st.error(f"❌ Unexpected preprocessing error: {e}")
     st.stop()
 
 # === Load or Train Model ===
