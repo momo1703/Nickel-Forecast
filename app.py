@@ -47,7 +47,7 @@ if not os.path.exists(model_path):
         st.stop()
     model = trained_model
 else:
-    model = load_model(model_path)
+    model = load_model(model_path, compile=False)  # ✅ Safe loading
 
 try:
     model = load_model(model_path)
