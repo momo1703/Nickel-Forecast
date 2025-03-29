@@ -36,4 +36,4 @@ def plot_predictions(predicted, actual):
     fig, ax = plt.subplots()
     ax.plot(actual, label="Actual Price")
     ax.plot(predicted, label="Predicted Price")
-    ax.set_title("Nickel Price Forecast_
+    ax.set_title("Nickel Price Forecast")
