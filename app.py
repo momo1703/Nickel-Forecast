@@ -1,4 +1,3 @@
-files["app.py"] = '''
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -6,7 +5,7 @@ import os
 from tensorflow.keras.models import load_model
 from utils.preprocessing import load_and_preprocess_data
 from utils.prediction import predict_prices, plot_predictions
-from train_model_streamlit import train_lstm_model  # 🔁 Retrain function
+from train_model_streamlit import train_lstm_model
 
 st.set_page_config(page_title="Nickel Price Forecast", layout="centered")
 st.title("🔮 Nickel Price Forecast (LME-based)")
@@ -34,21 +33,4 @@ except Exception as e:
     st.error(f"❌ Preprocessing error: {e}")
     st.stop()
 
-if st.button("🔁 Retrain LSTM Model from Current Data"):
-    trained_model = train_lstm_model(df)
-    if trained_model:
-        st.success("✅ Model retrained and saved!")
-
-model_path = "model/lstm_model.h5"
-if not os.path.exists(model_path):
-    st.warning("⚠️ No trained model found. Please retrain it first.")
-    st.stop()
-
-try:
-    model = load_model(model_path)
-except Exception as e:
-    st.error(f"❌ Failed to load model: {e}")
-    st.stop()
-
-try:
-    predicted, actual = predict_prices(model, X_
+if st.button("🔁 Retrain
