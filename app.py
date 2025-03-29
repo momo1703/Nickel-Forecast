@@ -6,7 +6,9 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.losses import MeanSquaredError
 from utils.preprocessing import load_and_preprocess_data
 from utils.prediction import predict_prices, plot_predictions
-from train_model_streamlit import train_lstm_model
+__pycache__/
+model/lstm_model.h5
+.streamlit/secrets.toml
 
 st.set_page_config(page_title="Nickel Price Forecast", layout="centered")
 st.title("🔮 Nickel Price Forecast (LME-based)")
