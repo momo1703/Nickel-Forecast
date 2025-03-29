@@ -6,18 +6,21 @@ import numpy as np
 from tensorflow.keras.models import load_model
 from tensorflow.keras.losses import MeanSquaredError
 
+# === Set base path for relative imports ===
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(BASE_DIR)
 
+# === Local module imports ===
 from utils.prediction import predict_prices, plot_predictions
 from utils.preprocessing import load_and_preprocess_data
 from train_model_streamlit import train_lstm_model
 
-
+# === Streamlit App Layout ===
 st.set_page_config(page_title="Nickel Price Forecast", layout="centered")
 st.title("🔮 Nickel Price Forecast (LME-based)")
 st.markdown("Forecast LME Nickel prices using AI (LSTM) and macro indicators.")
 
+# === File Upload or Fallback ===
 uploaded_file = st.file_uploader("📁 Upload your CSV data", type=["csv"])
 if uploaded_file:
     try:
@@ -35,12 +38,14 @@ else:
         st.error("❌ No dataset found. Please upload a CSV.")
         st.stop()
 
+# === Data Preprocessing ===
 try:
     X_test, y_test, scaler, features_tail = load_and_preprocess_data(df)
 except Exception as e:
     st.error(f"❌ Preprocessing error: {e}")
     st.stop()
 
+# === Load or Train Model ===
 model_path = os.path.join(BASE_DIR, "model", "lstm_model.h5")
 if not os.path.exists(model_path):
     st.warning("⚠️ No trained model found. Training a new one...")
@@ -59,10 +64,18 @@ else:
         st.error(f"❌ Failed to load model: {e}")
         st.stop()
 
+# === Run Prediction and Plot ===
 try:
-    predicted, actual = predict_prices(model, X_test, y_test, scaler, features_tail)
+    result = predict_prices(model, X_test, y_test, scaler, features_tail)
+    if result is None or len(result) != 2:
+        raise ValueError("❌ Prediction failed or returned incomplete output.")
+    
+    predicted, actual = result
     plot_predictions(predicted, actual)
     st.success("✅ Forecast complete.")
+
+except ValueError as ve:
+    st.error(str(ve))
 except Exception as e:
     st.error(f"❌ Prediction error: {e}")
-    st.info("📌 Tip: Ensure your CSV has required columns and ~20+ clean rows.")
+    st.info("📌 Tip: Ensure your CSV has all required columns and at least 20 clean rows.")
