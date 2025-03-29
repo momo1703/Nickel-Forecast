@@ -4,31 +4,34 @@ import streamlit as st
 
 def predict_prices(model, X, y, scaler, tail_features):
     try:
+        # === Run model prediction ===
         predictions = model.predict(X)
 
-        # === Validation ===
+        # === Check for shape mismatches ===
         if predictions.shape[0] != tail_features.shape[0]:
-            raise ValueError(f"Prediction shape {predictions.shape} vs tail_features {tail_features.shape} mismatch.")
+            raise ValueError(f"❌ Predictions and tail features row mismatch: {predictions.shape[0]} vs {tail_features.shape[0]}")
         if predictions.shape[1] != 1:
-            raise ValueError("Predictions must be shape (n_samples, 1).")
-        if y.ndim == 1:
-            y = y.reshape(-1, 1)
+            raise ValueError("❌ Predictions must be shape (n_samples, 1).")
 
-        # === Check original scaler input shape ===
-        expected_shape = scaler.n_features_in_
-        tail_cols = tail_features[:, 1:].shape[1]
-        total_cols = 1 + tail_cols
+        # === Get how many features the scaler expects ===
+        expected_cols = scaler.n_features_in_
 
-        if total_cols != expected_shape:
-            raise ValueError(f"Scaler was fit on {expected_shape} features but prediction input has {total_cols} columns.")
+        # === Match scaler input by trimming tail_features ===
+        # Use only the right number of trailing features to match scaler.fit() input
+        cols_needed_from_tail = expected_cols - 1
+        if tail_features.shape[1] < cols_needed_from_tail + 1:
+            raise ValueError(f"❌ Tail features have {tail_features.shape[1]} columns but expected at least {cols_needed_from_tail + 1}")
 
-        # === Prepare inverse scaling input ===
-        predicted_full = np.hstack((predictions, tail_features[:, 1:]))
-        actual_full = np.hstack((y, tail_features[:, 1:]))
+        tail_trimmed = tail_features[:, 1:1+cols_needed_from_tail]
 
-        if not np.isfinite(predicted_full).all():
-            raise ValueError("predicted_full contains invalid values.")
+        # === Build full arrays for inverse_transform ===
+        predicted_full = np.hstack((predictions, tail_trimmed))
+        actual_full = np.hstack((y.reshape(-1, 1), tail_trimmed))
 
+        if predicted_full.shape[1] != expected_cols:
+            raise ValueError(f"❌ Predicted input shape mismatch: expected {expected_cols}, got {predicted_full.shape[1]}")
+
+        # === Inverse scale to original price ===
         predicted_prices = scaler.inverse_transform(predicted_full)[:, 0]
         actual_prices = scaler.inverse_transform(actual_full)[:, 0]
 
@@ -36,6 +39,7 @@ def predict_prices(model, X, y, scaler, tail_features):
 
     except Exception as e:
         raise ValueError(f"Prediction failed: {e}")
+
 
 def plot_predictions(predicted, actual):
     fig, ax = plt.subplots()
