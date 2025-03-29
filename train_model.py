@@ -48,16 +48,4 @@ def train_lstm_model(df, seq_len=10, model_path="model/lstm_model.h5"):
         ])
         model.compile(optimizer='adam', loss='mse')
 
-        # Train
-        with st.spinner("⏳ Training model..."):
-            model.fit(X, y, epochs=50, batch_size=8, verbose=0)
-
-        # Save model
-        os.makedirs(os.path.dirname(model_path), exist_ok=True)
-        model.save(model_path)
-
-        st.success("✅ Model trained and saved successfully!")
-        return model
-
-    except Exception as e:
-        st.error(f"❌ Training failed: {e}")
+        with st.spinner("⏳ Training model
