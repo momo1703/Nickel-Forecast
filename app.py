@@ -6,21 +6,15 @@ import numpy as np
 from tensorflow.keras.models import load_model
 from tensorflow.keras.losses import MeanSquaredError
 
-# === Set up paths ===
+# ✅ Ensure this folder is importable
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-UTILS_DIR = os.path.join(BASE_DIR, "utils")
 sys.path.append(BASE_DIR)
-sys.path.append(UTILS_DIR)
 
-# ✅ Safe dynamic imports (alternative to "from utils.prediction import ...")
-try:
-        from utils.prediction import predict_prices, plot_predictions
-        from utils.preprocessing import load_and_preprocess_data
-except ImportError:
-    st.error("❌ Could not import utility functions. Make sure 'utils/' folder has prediction.py and preprocessing.py")
-    st.stop()
-
+# ✅ Import from utils
+from utils.prediction import predict_prices, plot_predictions
+from utils.preprocessing import load_and_preprocess_data
 from train_model_streamlit import train_lstm_model
+
 
 # === Streamlit UI ===
 st.set_page_config(page_title="Nickel Price Forecast", layout="centered")
