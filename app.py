@@ -14,7 +14,7 @@ from tensorflow.keras.losses import MeanSquaredError
 # ✅ Local imports
 from train_model_streamlit import train_lstm_model
 from utils.preprocessing import load_and_preprocess_data
-from utils.prediction import predict_prices, plot_prediction
+from utils.prediction import predict_prices, plot_predictions
 
 # === Streamlit UI ===
 st.set_page_config(page_title="Nickel Price Forecast", layout="centered")
