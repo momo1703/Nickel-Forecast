@@ -1,50 +1,63 @@
 import os
 import pandas as pd
 import numpy as np
+import streamlit as st
 from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dropout, Dense
 
-# Load CSV data
-df = pd.read_csv("data/lme_nickel_data.csv")
-df['Date'] = pd.to_datetime(df['Date'], dayfirst=True)
-df.set_index('Date', inplace=True)
+def train_lstm_model(df, seq_len=10, model_path="model/lstm_model.h5"):
+    try:
+        # Ensure Date column exists and parse it
+        date_column = next((col for col in df.columns if "date" in col.lower()), None)
+        if not date_column:
+            st.error("❌ Date column not found.")
+            return
 
-# Select features
-features = ['LME_Nickel_Spot', 'USD_Index', 'Oil_Price', 'PMI_Index']
-df = df[features].dropna()
+        df[date_column] = pd.to_datetime(df[date_column], dayfirst=True)
+        df.set_index(date_column, inplace=True)
 
-# Scale features
-scaler = MinMaxScaler()
-scaled = scaler.fit_transform(df)
+        # Required features
+        features = ['LME_Nickel_Spot', 'USD_Index', 'Oil_Price', 'PMI_Index']
+        missing = [feat for feat in features if feat not in df.columns]
+        if missing:
+            st.error(f"❌ Missing expected columns: {', '.join(missing)}")
+            return
 
-# Prepare sequences
-SEQ_LEN = 10
-X, y = [], []
-for i in range(len(scaled) - SEQ_LEN):
-    X.append(scaled[i:i+SEQ_LEN])
-    y.append(scaled[i+SEQ_LEN][0])  # Predict LME Nickel Spot Price
+        df = df[features].dropna()
 
-X = np.array(X)
-y = np.array(y)
+        # Scale
+        scaler = MinMaxScaler()
+        scaled = scaler.fit_transform(df)
 
-# Build LSTM model
-model = Sequential([
-    LSTM(100, return_sequences=True, input_shape=(SEQ_LEN, X.shape[2])),
-    Dropout(0.2),
-    LSTM(50),
-    Dropout(0.2),
-    Dense(1)
-])
+        # Sequence creation
+        X, y = [], []
+        for i in range(len(scaled) - seq_len):
+            X.append(scaled[i:i+seq_len])
+            y.append(scaled[i+seq_len][0])
 
-model.compile(optimizer='adam', loss='mse')
+        X, y = np.array(X), np.array(y)
 
-# Train the model
-model.fit(X, y, epochs=50, batch_size=8)
+        # Build model
+        model = Sequential([
+            LSTM(100, return_sequences=True, input_shape=(seq_len, X.shape[2])),
+            Dropout(0.2),
+            LSTM(50),
+            Dropout(0.2),
+            Dense(1)
+        ])
+        model.compile(optimizer='adam', loss='mse')
 
-# ✅ Ensure model folder exists before saving
-os.makedirs("model", exist_ok=True)
+        # Train
+        with st.spinner("⏳ Training model..."):
+            model.fit(X, y, epochs=50, batch_size=8, verbose=0)
 
-# Save the trained model
-model.save("model/lstm_model.h5")
-print("✅ Model saved at model/lstm_model.h5")
+        # Save model
+        os.makedirs(os.path.dirname(model_path), exist_ok=True)
+        model.save(model_path)
+
+        st.success("✅ Model trained and saved successfully!")
+        return model
+
+    except Exception as e:
+        st.error(f"❌ Training failed: {e}")
