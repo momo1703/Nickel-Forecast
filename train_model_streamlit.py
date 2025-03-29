@@ -8,10 +8,16 @@ from tensorflow.keras.layers import LSTM, Dropout, Dense
 
 def train_lstm_model(df, seq_len=10, model_path="model/lstm_model.h5"):
     try:
-        date_column = next((col for col in df.columns if "date" in col.lower()), None)
-if not date_column:
-    st.error("❌ Date column not found.")
+        # Try to find a date column, fallback to first column if nothing found
+date_column = next((col for col in df.columns if "date" in col.lower()), df.columns[0])
+try:
+    df[date_column] = pd.to_datetime(df[date_column], dayfirst=True)
+except Exception as e:
+    st.error(f"❌ Failed to parse date column '{date_column}': {e}")
     return
+
+df.set_index(date_column, inplace=True)
+
 
         df[date_column] = pd.to_datetime(df[date_column], dayfirst=True)
         df.set_index(date_column, inplace=True)
