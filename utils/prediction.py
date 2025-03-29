@@ -1,37 +1,40 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import streamlit as st
+
 def predict_prices(model, X, y, scaler, tail_features):
     try:
-        # === Predict using the model ===
+        # === Model Prediction ===
         predictions = model.predict(X)
 
-        # === Check for invalid values ===
-        for name, array in {
+        # === Validation Checks ===
+        arrays = {
             "X": X,
             "y": y,
             "tail_features": tail_features,
             "predictions": predictions
-        }.items():
-            if np.any(np.isnan(array)):
+        }
+
+        for name, arr in arrays.items():
+            if np.any(np.isnan(arr)):
                 raise ValueError(f"❌ {name} contains NaN values.")
-            if np.any(np.isinf(array)):
+            if np.any(np.isinf(arr)):
                 raise ValueError(f"❌ {name} contains Inf values.")
 
-        # === Check shape compatibility ===
         if predictions.shape[0] != tail_features.shape[0]:
-            raise ValueError(
-                f"❌ Shape mismatch: predictions ({predictions.shape}) vs tail_features ({tail_features.shape})"
-            )
+            raise ValueError("❌ Prediction and tail feature count mismatch.")
 
-        # === Prepare data for inverse transform ===
+        if predictions.shape[1] != 1:
+            raise ValueError("❌ Predictions must be shape (n_samples, 1).")
+
+        if tail_features.shape[1] < 4:
+            raise ValueError("❌ Tail features must have at least 4 columns.")
+
+        # === Prepare Inputs for Inverse Scaling ===
         predicted_full = np.hstack((predictions, tail_features[:, 1:]))
         actual_full = np.hstack((y.reshape(-1, 1), tail_features[:, 1:]))
 
-        # === Final safety before inverse transform ===
-        if np.any(np.isnan(predicted_full)) or np.any(np.isinf(predicted_full)):
-            raise ValueError("❌ predicted_full has NaN or Inf before inverse_transform.")
-        if np.any(np.isnan(actual_full)) or np.any(np.isinf(actual_full)):
-            raise ValueError("❌ actual_full has NaN or Inf before inverse_transform.")
-
-        # === Run inverse transform ===
+        # === Inverse Transform ===
         predicted_prices = scaler.inverse_transform(predicted_full)[:, 0]
         actual_prices = scaler.inverse_transform(actual_full)[:, 0]
 
@@ -39,9 +42,14 @@ def predict_prices(model, X, y, scaler, tail_features):
 
     except Exception as e:
         raise ValueError(f"❌ Prediction pipeline error: {e}")
-        
+
+
 def plot_predictions(predicted, actual):
     fig, ax = plt.subplots()
-    ax.plot(actual, label="Actual Price")
-    ax.plot(predicted, label="Predicted Price")
-    ax.set_title("Nickel Price Forecast")
+    ax.plot(actual, label="Actual Price", linewidth=2)
+    ax.plot(predicted, label="Predicted Price", linestyle="--", linewidth=2)
+    ax.set_title("Nickel Price Forecast")
+    ax.set_xlabel("Time")
+    ax.set_ylabel("LME Nickel Spot Price")
+    ax.legend()
+    st.pyplot(fig)
