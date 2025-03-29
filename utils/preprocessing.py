@@ -23,7 +23,7 @@ def load_and_preprocess_data(df, seq_len=10):
     # === Drop rows with NaNs and scale ===
     df = df[features].dropna()
     if len(df) <= seq_len:
-        raise ValueError("❌ Not enough rows after cleaning to build sequences.")
+        raise ValueError(f"❌ Not enough rows to build sequences. Only {len(df)} rows after cleaning, but need at least {seq_len + 1}.")
 
     scaler = MinMaxScaler()
     scaled = scaler.fit_transform(df)
