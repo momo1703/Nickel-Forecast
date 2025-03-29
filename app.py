@@ -1,4 +1,3 @@
-files["app.py"] = '''
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -6,7 +5,7 @@ import os
 from tensorflow.keras.models import load_model
 from utils.preprocessing import load_and_preprocess_data
 from utils.prediction import predict_prices, plot_predictions
-from train_model_streamlit import train_lstm_model  # 🔁 Retrain function
+from train_model_streamlit import train_lstm_model
 
 st.set_page_config(page_title="Nickel Price Forecast", layout="centered")
 st.title("🔮 Nickel Price Forecast (LME-based)")
@@ -56,4 +55,3 @@ try:
     st.success("✅ Forecast generated.")
 except Exception as e:
     st.error(f"❌ Prediction error: {e}")
-'''
