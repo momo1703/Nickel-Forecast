@@ -3,7 +3,6 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 
 def load_and_preprocess_data(df, seq_len=60):
-    # Try to find a date column
     date_column = next((col for col in df.columns if 'date' in col.lower()), None)
     if not date_column:
         raise ValueError("No date column found. Include a column like 'Date' in your CSV.")
