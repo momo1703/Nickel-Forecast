@@ -6,21 +6,21 @@ import numpy as np
 from tensorflow.keras.models import load_model
 from tensorflow.keras.losses import MeanSquaredError
 
-# ✅ Add project root to sys.path for clean import
+# === Set up base directory for relative paths ===
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(BASE_DIR)
 
-# ✅ Now you can use this standard import
-from utils.prediction import predict_prices, plot_predictions
-from utils.preprocessing import load_and_preprocess_data
+# === Local imports ===
 from train_model_streamlit import train_lstm_model
+from utils.preprocessing import load_and_preprocess_data
+from utils.prediction import predict_prices, plot_predictions
 
 # === Streamlit UI ===
 st.set_page_config(page_title="Nickel Price Forecast", layout="centered")
 st.title("🔮 Nickel Price Forecast (LME-based)")
 st.markdown("Forecast LME Nickel prices using AI (LSTM) and macro indicators.")
 
-# === Upload or Load CSV ===
+# === File uploader or default ===
 uploaded_file = st.file_uploader("📁 Upload your CSV data", type=["csv"])
 if uploaded_file:
     try:
@@ -45,7 +45,7 @@ except Exception as e:
     st.error(f"❌ Preprocessing error: {e}")
     st.stop()
 
-# === Load or Train Model ===
+# === Load or retrain model ===
 model_path = os.path.join(BASE_DIR, "model", "lstm_model.h5")
 if not os.path.exists(model_path):
     st.warning("⚠️ No trained model found. Training a new one...")
@@ -64,7 +64,7 @@ else:
         st.error(f"❌ Failed to load model: {e}")
         st.stop()
 
-# === Predict and Plot ===
+# === Predict and display results ===
 try:
     predicted, actual = predict_prices(model, X_test, y_test, scaler, features_tail)
     plot_predictions(predicted, actual)
