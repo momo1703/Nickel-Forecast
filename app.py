@@ -70,3 +70,4 @@ try:
     st.success("✅ Forecast complete.")
 except Exception as e:
     st.error(f"❌ Prediction error: {e}")
+    st.info("🛠 Tip: Make sure your input data is clean (no NaNs, reasonable scale).")
