@@ -6,7 +6,6 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dropout, Dense
 from tensorflow.keras.losses import MeanSquaredError  # ✅ Use real object
 
-# Load data
 df = pd.read_csv("data/lme_nickel_data.csv")
 df['Date'] = pd.to_datetime(df['Date'], dayfirst=True)
 df.set_index('Date', inplace=True)
@@ -14,11 +13,9 @@ df.set_index('Date', inplace=True)
 features = ['LME_Nickel_Spot', 'USD_Index', 'Oil_Price', 'PMI_Index']
 df = df[features].dropna()
 
-# Normalize
 scaler = MinMaxScaler()
 scaled = scaler.fit_transform(df)
 
-# Create sequences
 SEQ_LEN = 10
 X, y = [], []
 for i in range(len(scaled) - SEQ_LEN):
@@ -30,7 +27,6 @@ X, y = np.array(X), np.array(y)
 if len(X) == 0:
     raise ValueError("❌ Not enough data to create sequences. Reduce SEQ_LEN or add more data.")
 
-# Build model
 model = Sequential([
     LSTM(100, return_sequences=True, input_shape=(SEQ_LEN, X.shape[2])),
     Dropout(0.2),
@@ -39,5 +35,4 @@ model = Sequential([
     Dense(1)
 ])
 
-# ✅ Use real loss function to prevent load errors
 model.compile(
