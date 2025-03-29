@@ -64,4 +64,5 @@ try:
     st.success("✅ Forecast complete.")
 except Exception as e:
     st.error(f"❌ Prediction error: {e}")
-    st.info("📌 Tip: Ensure your CSV has no NaNs and enough rows (~20+).")
+    st.info("📌 Tip: Ensure your CSV has columns: 'Date', 'LME_Nickel_Spot', 'USD_Index', 'Oil_Price', 'PMI_Index' and at least 20 rows with no NaNs.")
+
