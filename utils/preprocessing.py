@@ -3,10 +3,22 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 
 def load_and_preprocess_data(df, seq_len=60):
-    df['Date'] = pd.to_datetime(df['Date'])
-    df.set_index('Date', inplace=True)
+    # Attempt to find a date column
+    date_column = next((col for col in df.columns if 'date' in col.lower()), None)
+    
+    if date_column is None:
+        raise ValueError("No date column found. Make sure your CSV includes a column like 'Date'.")
 
+    df[date_column] = pd.to_datetime(df[date_column])
+    df.set_index(date_column, inplace=True)
+
+    # Define expected features
     features = ['LME_Nickel_Spot', 'USD_Index', 'Oil_Price', 'PMI_Index']
+    
+    for feat in features:
+        if feat not in df.columns:
+            raise ValueError(f"Missing expected feature: '{feat}' in the uploaded data.")
+
     df = df[features].dropna()
 
     scaler = MinMaxScaler()
