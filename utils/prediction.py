@@ -17,18 +17,18 @@ def predict_prices(model, X, y, scaler, tail_features):
 
         for name, arr in arrays.items():
             if np.any(np.isnan(arr)):
-                raise ValueError(f"❌ {name} contains NaN values.")
+                raise ValueError(f"{name} contains NaN values.")
             if np.any(np.isinf(arr)):
-                raise ValueError(f"❌ {name} contains Inf values.")
+                raise ValueError(f"{name} contains Inf values.")
 
         if predictions.shape[0] != tail_features.shape[0]:
-            raise ValueError("❌ Prediction and tail feature count mismatch.")
+            raise ValueError("Prediction and tail feature count mismatch.")
 
         if predictions.shape[1] != 1:
-            raise ValueError("❌ Predictions must be shape (n_samples, 1).")
+            raise ValueError("Predictions must be shape (n_samples, 1).")
 
         if tail_features.shape[1] < 4:
-            raise ValueError("❌ Tail features must have at least 4 columns.")
+            raise ValueError("Tail features must have at least 4 columns.")
 
         # === Prepare Inputs for Inverse Scaling ===
         predicted_full = np.hstack((predictions, tail_features[:, 1:]))
@@ -43,7 +43,7 @@ def predict_prices(model, X, y, scaler, tail_features):
     except ValueError as ve:
         st.error(str(ve))
     except Exception as e:
-        st.error(f"❌ Unexpected prediction error: {e}")
+        st.error(f"Unexpected prediction error: {e}")
 
 
 def plot_predictions(predicted, actual):
