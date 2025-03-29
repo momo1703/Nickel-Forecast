@@ -1,9 +1,17 @@
-import os
+iimport os
 import sys
+import importlib.util
 
-# ✅ Ensure utils/ can be imported
-BASE_DIR = os.path.dirname(__file__)
-sys.path.append(BASE_DIR)
+# 👇 Force import from ./utils/ even if Python doesn't detect it
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+UTILS_PATH = os.path.join(BASE_DIR, "utils")
+
+if UTILS_PATH not in sys.path:
+    sys.path.append(UTILS_PATH)
+
+# Optional: Make sure utils behaves as a module
+if not os.path.exists(os.path.join(UTILS_PATH, "__init__.py")):
+    open(os.path.join(UTILS_PATH, "__init__.py"), 'a').close()
 
 import streamlit as st
 import pandas as pd
