@@ -2,10 +2,13 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import os
+import sys
+sys.path.append(os.path.dirname(__file__))
+
 from tensorflow.keras.models import load_model
 from utils.preprocessing import load_and_preprocess_data
 from utils.prediction import predict_prices, plot_predictions
-from train_model_streamlit import train_lstm_model  # Must be in same folder
+from train_model_streamlit import train_lstm_model
 
 st.set_page_config(page_title="Nickel Price Forecast", layout="centered")
 st.title("🔮 Nickel Price Forecast (LME-based)")
