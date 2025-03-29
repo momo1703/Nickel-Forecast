@@ -42,3 +42,9 @@ def predict_prices(model, X, y, scaler, tail_features):
 
     except Exception as e:
         raise ValueError(f"Prediction failed: {e}")  # 🔁 raise instead of silent return
+
+def plot_predictions(predicted, actual):
+    fig, ax = plt.subplots()
+    ax.plot(actual, label="Actual Price")
+    ax.plot(predicted, label="Predicted Price")
+    ax.set_title("Nickel Price Forecast")
